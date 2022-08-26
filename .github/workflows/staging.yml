@@ -46,38 +46,20 @@ jobs:
         heroku_app_name: ${{ secrets.HEROKU_APP_NAME_STAGING }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
   
-  notify-slack-failed:
-    name: Notifying on Slack failed tests
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: Slack Notification
-      if: always() && (steps.tests.outcome == 'failure')
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_CHANNEL: test123
-        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
-        SLACK_MESSAGE: 'TESTS Failed :home:'
-        SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
-        SLACK_USERNAME: rtCamp
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-
   notify-slack-success:
-    name: Notifying on Slack success tests
+    name: Notifying on Slack
+    needs: [heroku-deploy-staging]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
 
     - name: Slack Notification
-      if: always() && (steps.tests.outcome == 'success')
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: test123
         SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
         SLACK_ICON: https://github.com/rtCamp.png?size=48
-        SLACK_MESSAGE: 'TESTS PASSED :rocket:'
+        SLACK_MESSAGE: 'Post Content :rocket:'
         SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
-        SLACK_USERNAME: rtCamp
+        SLACK_USERNAME: Release bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
