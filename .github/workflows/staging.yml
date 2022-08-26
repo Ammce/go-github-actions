@@ -67,12 +67,12 @@ jobs:
   notify-slack-failure:
     name: Notifying on Slack if failure
     needs: [tests]
+    if: ${{ always() && needs.tests.result == 'failure' }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
 
     - name: Slack Notification
-      if: ${{ always() && needs.tests.result == 'failure' }}
       uses: rtCamp/action-slack-notify@v2
       env:
         SLACK_CHANNEL: test123
