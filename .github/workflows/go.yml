@@ -21,5 +21,10 @@ jobs:
     - name: Just greet the user
       run: echo Hello there Ammce
 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
     - name: Test
       run: go test
