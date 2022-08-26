@@ -29,17 +29,6 @@ jobs:
 
     - name: API Tests
       run: go test
-    - name: Slack Notification
-      if: ${{ failure() }}
-      uses: rtCamp/action-slack-notify@v2
-      env:
-        SLACK_CHANNEL: test123
-        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-        SLACK_ICON: https://github.com/rtCamp.png?size=48
-        SLACK_MESSAGE: 'Something failed :warning:'
-        SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
-        SLACK_USERNAME: Error bot
-        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
   heroku-deploy-staging:
     name: Deploying to staging
     needs: [tests]
@@ -75,21 +64,21 @@ jobs:
         SLACK_USERNAME: Release bot
         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
 
-  # notify-slack-failure:
-  #   name: Notifying on Slack if failure
-  #   needs: [tests]
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - uses: actions/checkout@v3
+  notify-slack-failure:
+    name: Notifying on Slack if failure
+    needs: [tests]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
 
-  #   - name: Slack Notification
-  #     if: ${{ failure() }}
-  #     uses: rtCamp/action-slack-notify@v2
-  #     env:
-  #       SLACK_CHANNEL: test123
-  #       SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
-  #       SLACK_ICON: https://github.com/rtCamp.png?size=48
-  #       SLACK_MESSAGE: 'Something failed :warning:'
-  #       SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
-  #       SLACK_USERNAME: Error bot
-  #       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    - name: Slack Notification
+      if: ${{ always() && (needs.tests.result != 'success') }}
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: test123
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: 'Something failed :warning:'
+        SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
+        SLACK_USERNAME: Error bot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
