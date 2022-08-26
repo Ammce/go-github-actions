@@ -1,20 +1,23 @@
 package main
 
 import (
-	"io"
-	"log"
+	"fmt"
 	"net/http"
-	"os"
+
+	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	port := os.Getenv("PORT")
-	helloHandler := func(w http.ResponseWriter, req *http.Request) {
-		io.WriteString(w, "Hello, world!\n")
-	}
-	http.HandleFunc("/", helloHandler)
-	log.Println("Listing for" + port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	result := SumTwoNumbers(10, 12)
+	fmt.Println("Hello there from Golang", result)
+
+	r := gin.Default()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 
 }
 
