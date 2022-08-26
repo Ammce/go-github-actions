@@ -21,14 +21,16 @@ jobs:
     - name: Just greet the user
       run: echo Hello there Ammce
 
-  test:
+  tests:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
 
-    - name: Test
+    - name: API Tests
       run: go test
   heroku-deploy-prod:
+    name: Deploying to production
+    needs: [test]
     runs-on: ubuntu-latest
     environment:
       name: production
