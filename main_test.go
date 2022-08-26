@@ -7,5 +7,7 @@ import (
 )
 
 func TestSumTwoNumbers(t *testing.T) {
-	assert.True(t, false, "True is true")
+	sum := SumTwoNumbers(5, 10)
+	var expectedResult int32 = 15
+	assert.Equal(t, expectedResult, sum)
 }
