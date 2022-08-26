@@ -44,7 +44,14 @@ jobs:
         heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
         heroku_app_name: ${{ secrets.HEROKU_APP_NAME_STAGING }}
         heroku_email: ${{ secrets.HEROKU_EMAIL }}
-
+  
+  notify-slack-success:
+    name: Notifying on Slack
+    needs: [heroku-deploy-staging]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      
     - name: Slack Notification
       uses: rtCamp/action-slack-notify@v2
       env:
