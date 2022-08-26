@@ -28,8 +28,11 @@ jobs:
 
     - name: Test
       run: go test
-  heroku-deploy:
+  heroku-deploy-prod:
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: 'https://go-github-actions.herokuapp.com/'
     steps:
     - uses: actions/checkout@v3
 
