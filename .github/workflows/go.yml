@@ -30,7 +30,7 @@ jobs:
       run: go test
   heroku-deploy-prod:
     name: Deploying to production
-    needs: [test]
+    needs: [tests]
     runs-on: ubuntu-latest
     environment:
       name: production
