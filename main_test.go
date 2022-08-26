@@ -8,6 +8,6 @@ import (
 
 func TestSumTwoNumbers(t *testing.T) {
 	sum := SumTwoNumbers(5, 10)
-	var expectedResult int32 = 15
+	var expectedResult int32 = 115
 	assert.Equal(t, expectedResult, sum)
 }
