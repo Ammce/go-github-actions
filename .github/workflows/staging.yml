@@ -1,0 +1,84 @@
+name: Deploy Staging
+
+on:
+  push:
+    branches: [ "staging" ]
+  pull_request:
+    branches: [ "staging" ]
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Go
+      uses: actions/setup-go@v3
+      with:
+        go-version: 1.18
+    
+    - name: Just greet the user
+      run: echo Hello there ${{ github.actor }}
+
+  tests:
+    name: Running tests
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: API Tests
+      run: go test
+  heroku-deploy-staging:
+    name: Deploying to staging
+    needs: [tests]
+    runs-on: ubuntu-latest
+    environment:
+      name: staging
+      url: 'https://go-github-actions-staging.herokuapp.com/'
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@v3.12.12
+      with:
+        heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+        heroku_app_name: ${{ secrets.HEROKU_APP_NAME_STAGING }}
+        heroku_email: ${{ secrets.HEROKU_EMAIL }}
+  
+  notify-slack-success:
+    name: Notifying on Slack
+    needs: [heroku-deploy-staging]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: test123
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: 'Post Content :rocket:'
+        SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
+        SLACK_USERNAME: Release bot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+  notify-slack-failure:
+    name: Notifying on Slack if failure
+    needs: [tests]
+    if: ${{ always() && needs.tests.result == 'failure' }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Slack Notification
+      uses: rtCamp/action-slack-notify@v2
+      env:
+        SLACK_CHANNEL: test123
+        SLACK_COLOR: ${{ job.status }} # or a specific color like 'good' or '#ff00ff'
+        SLACK_ICON: https://github.com/rtCamp.png?size=48
+        SLACK_MESSAGE: 'Something failed :warning:'
+        SLACK_TITLE: ${{ github.event.head_commit.message }} # Commit message
+        SLACK_USERNAME: Error bot
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
